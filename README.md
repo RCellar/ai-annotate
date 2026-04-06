@@ -44,6 +44,12 @@ Open **Settings > AI Annotate** to configure. In most cases the defaults work ou
 - **Timeout** — Maximum seconds to wait for a Claude response (default: 60).
 - **Model** — Optional. Override the default Claude model (e.g., `claude-sonnet-4-5-20250514`). Leave empty to use the CLI default.
 - **System prompt** — The instruction sent to Claude with every request. The default tells Claude to return only the replacement text for the targeted section.
+- **Context sent to Claude** — Controls how much of the document is included in each prompt. Options:
+  - *Section ± neighbors* (default) — the heading section containing the target plus adjacent sections. Balances context awareness with token cost.
+  - *Target section only* — just the heading section containing the target. Lowest token usage.
+  - *Full document* — the entire note. Maximum context but highest token cost.
+- **Extra CLI arguments** — Additional arguments appended to the `claude` command (e.g., `--max-turns 5`). See the [CLI reference](https://code.claude.com/docs/en/cli-reference).
+- **Environment variables** — One `KEY=VALUE` per line, merged into the CLI process environment.
 
 ## Usage
 
@@ -102,7 +108,7 @@ No default hotkeys are assigned. Bind them in **Settings > Hotkeys** to your pre
 ## How it works
 
 1. You create an annotation (inline marker or selection)
-2. The plugin assembles a prompt containing the full document with line numbers, the target section marked with delimiters, and your instruction
+2. The plugin assembles a prompt containing document context (scoped by the context strategy setting) with line numbers, the target section marked with delimiters, and your instruction
 3. The prompt is sent to Claude via the CLI (`claude -p --output-format stream-json`)
 4. Claude's response is diffed against the original text
 5. The diff is rendered inline using CodeMirror 6 decorations
