@@ -42,6 +42,7 @@
 - UI text follows Obsidian sentence case conventions.
 - Floating promises are properly handled with `void` operator.
 - Removed unnecessary type assertion in internal CodeMirror view accessor.
+- `%%ai` markers inside unclosed fenced code blocks are now suppressed, matching Obsidian's own rendering behaviour.
 
 ## 0.1.0 (2026-04-05)
 
