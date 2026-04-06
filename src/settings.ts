@@ -125,7 +125,14 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl).setName("Advanced").setHeading();
+    const advancedHeading = new Setting(containerEl).setName("Advanced").setHeading();
+    const descFragment = document.createDocumentFragment();
+    const cliRefLink = descFragment.createEl("a", {
+      text: "CLI reference",
+      href: "https://code.claude.com/docs/en/cli-reference",
+    });
+    cliRefLink.setAttr("target", "_blank");
+    advancedHeading.setDesc(descFragment);
 
     new Setting(containerEl)
       .setName("Extra CLI arguments")
