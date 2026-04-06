@@ -1,0 +1,12 @@
+node_modules
+main.js
+*.js.map
+data.json
+
+# Agent tooling
+.superpowers/
+.firecrawl/
+.agents/
+.claude/
+CLAUDE.md
+docs/superpowers/

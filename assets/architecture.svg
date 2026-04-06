@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-860 -340 1820 2780">
+  <defs>
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="12" refY="4" orient="auto">
+      <path d="M 0 0 L 12 4 L 0 8 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowhead-red" markerWidth="12" markerHeight="8" refX="12" refY="4" orient="auto">
+      <path d="M 0 0 L 12 4 L 0 8 z" fill="#ef4444"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="12" markerHeight="8" refX="12" refY="4" orient="auto">
+      <path d="M 0 0 L 12 4 L 0 8 z" fill="#22c55e"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect x="-860" y="-340" width="1820" height="2780" fill="white"/>
+
+  <!-- Group: Core Pipeline -->
+  <rect x="-320" y="200" width="740" height="2220" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="14 7"/>
+  <text x="50" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#64748b" text-anchor="middle">Core Pipeline</text>
+
+  <!-- ==================== NODES ==================== -->
+
+  <!-- Title -->
+  <g transform="translate(-80, -280)">
+    <rect width="460" height="80" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="230" y="36" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="bold" fill="#0f172a" text-anchor="middle">AI Annotate Plugin</text>
+    <text x="230" y="66" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#475569" text-anchor="middle">Architecture</text>
+  </g>
+
+  <!-- Inline Marker -->
+  <g transform="translate(-320, -140)">
+    <rect width="340" height="160" rx="8" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Inline Marker</text>
+    <text x="20" y="72" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">Write %%ai &lt;instruction&gt; %%</text>
+    <text x="20" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">in your note, then process</text>
+    <text x="20" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">via command palette</text>
+  </g>
+
+  <!-- Selection -->
+  <g transform="translate(280, -140)">
+    <rect width="340" height="160" rx="8" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Selection</text>
+    <text x="20" y="72" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">Select text, run Annotate</text>
+    <text x="20" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">selection command, enter</text>
+    <text x="20" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">instruction in modal</text>
+  </g>
+
+  <!-- Annotation Parser -->
+  <g transform="translate(-80, 240)">
+    <rect width="460" height="280" rx="8" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Annotation Parser</text>
+    <text x="20" y="62" font-family="'Courier New', Courier, monospace" font-size="18" fill="#64748b">annotation-parser.ts</text>
+    <text x="20" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Detects %%ai...%% markers via regex</text>
+    <text x="20" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Skips markers inside code blocks</text>
+    <text x="20" y="156" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; findTargetRange() walks to heading</text>
+    <text x="20" y="184" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; createSelectionAnnotation() for selections</text>
+    <text x="20" y="212" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Returns Annotation[] with target ranges</text>
+  </g>
+
+  <!-- Annotation Manager -->
+  <g transform="translate(-80, 620)">
+    <rect width="460" height="300" rx="8" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Annotation Manager</text>
+    <text x="20" y="62" font-family="'Courier New', Courier, monospace" font-size="18" fill="#64748b">annotation-manager.ts</text>
+    <text x="20" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Coordinates annotation lifecycle</text>
+    <text x="20" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; assemblePrompt() builds numbered prompt</text>
+    <text x="20" y="156" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; processAnnotation() orchestrates flow</text>
+    <text x="20" y="184" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; adjustOffsetsAfterEdit() shifts offsets</text>
+    <text x="20" y="212" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Tracks activeCancels for in-flight requests</text>
+  </g>
+
+  <!-- Claude Service -->
+  <g transform="translate(-80, 1020)">
+    <rect width="460" height="280" rx="8" fill="#faf5ff" stroke="#a855f7" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Claude Service</text>
+    <text x="20" y="62" font-family="'Courier New', Courier, monospace" font-size="18" fill="#64748b">claude-service.ts</text>
+    <text x="20" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Spawns claude -p --stream-json</text>
+    <text x="20" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Parses streaming JSON responses</text>
+    <text x="20" y="156" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; sanitizeResponse() strips fences</text>
+    <text x="20" y="184" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Configurable timeout and model</text>
+    <text x="20" y="212" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Returns { promise, cancel } tuple</text>
+  </g>
+
+  <!-- Diff Engine -->
+  <g transform="translate(-80, 1400)">
+    <rect width="460" height="260" rx="8" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Diff Engine</text>
+    <text x="20" y="62" font-family="'Courier New', Courier, monospace" font-size="18" fill="#64748b">diff-engine.ts</text>
+    <text x="20" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Tokenizes text into words</text>
+    <text x="20" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; LCS via dynamic programming</text>
+    <text x="20" y="156" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Produces DiffChunk[] (keep/add/remove)</text>
+    <text x="20" y="184" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; Merges consecutive chunks of same type</text>
+  </g>
+
+  <!-- Diff Decorations -->
+  <g transform="translate(-80, 1740)">
+    <rect width="460" height="280" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Diff Decorations</text>
+    <text x="20" y="62" font-family="'Courier New', Courier, monospace" font-size="18" fill="#64748b">diff-decorations.ts</text>
+    <text x="20" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; CM6 StateField for decorations</text>
+    <text x="20" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; ReviewButtonsWidget &#x2014; accept/reject</text>
+    <text x="20" y="156" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; DiffContentWidget &#x2014; inline diff</text>
+    <text x="20" y="184" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; reviewActionHandler bridges to plugin</text>
+  </g>
+
+  <!-- User Review -->
+  <g transform="translate(-80, 2120)">
+    <rect width="460" height="200" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">User Review</text>
+    <text x="20" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">Accept &#x2192; replace text, remove marker,</text>
+    <text x="20" y="104" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">adjust remaining offsets</text>
+    <text x="20" y="146" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">Reject &#x2192; restore original text</text>
+  </g>
+
+  <!-- Settings -->
+  <g transform="translate(560, 620)">
+    <rect width="340" height="300" rx="8" fill="#fefce8" stroke="#eab308" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Settings</text>
+    <text x="20" y="62" font-family="'Courier New', Courier, monospace" font-size="18" fill="#64748b">settings.ts</text>
+    <text x="20" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; claudePath &#x2014; default: claude</text>
+    <text x="20" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; timeout &#x2014; default: 60s</text>
+    <text x="20" y="156" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; systemPrompt &#x2014; (detailed)</text>
+    <text x="20" y="184" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">&#x2022; model &#x2014; (empty)</text>
+  </g>
+
+  <!-- State Machine -->
+  <g transform="translate(-800, 620)">
+    <rect width="360" height="320" rx="8" fill="#faf5ff" stroke="#a855f7" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">State Machine</text>
+    <text x="20" y="62" font-family="'Courier New', Courier, monospace" font-size="18" fill="#64748b">types.ts</text>
+    <text x="20" y="100" font-family="'Courier New', Courier, monospace" font-size="19" fill="#334155">created &#x2192; pending</text>
+    <text x="20" y="128" font-family="'Courier New', Courier, monospace" font-size="19" fill="#334155">  &#x2192; processing</text>
+    <text x="20" y="156" font-family="'Courier New', Courier, monospace" font-size="19" fill="#334155">    &#x2192; review</text>
+    <text x="20" y="184" font-family="'Courier New', Courier, monospace" font-size="19" fill="#334155">      &#x2192; accepted</text>
+    <text x="20" y="212" font-family="'Courier New', Courier, monospace" font-size="19" fill="#334155">      &#x2192; rejected</text>
+    <text x="20" y="258" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#64748b">Sources: inline | selection</text>
+  </g>
+
+  <!-- Offset Tracking -->
+  <g transform="translate(560, 1740)">
+    <rect width="340" height="280" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+    <text x="20" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="bold" fill="#0f172a">Offset Tracking</text>
+    <text x="20" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">After each accept:</text>
+    <text x="20" y="112" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">1. Compute delta =</text>
+    <text x="36" y="138" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">newLen - oldLen - markerLen</text>
+    <text x="20" y="172" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">2. Shift annotations where</text>
+    <text x="36" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">targetFrom &gt; editFrom</text>
+    <text x="20" y="232" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">3. Prevent double-shifting</text>
+    <text x="36" y="258" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#334155">in batch mode</text>
+  </g>
+
+  <!-- ==================== EDGES ==================== -->
+
+  <!-- Inline Marker → Parser -->
+  <line x1="-150" y1="20" x2="80" y2="240" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <text x="-45" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#475569" text-anchor="middle">%%ai...%%</text>
+
+  <!-- Selection → Parser -->
+  <line x1="450" y1="20" x2="220" y2="240" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <text x="350" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#475569" text-anchor="middle">selection + instruction</text>
+
+  <!-- Parser → Manager -->
+  <line x1="150" y1="520" x2="150" y2="620" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <text x="165" y="578" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#475569">Annotation objects</text>
+
+  <!-- Manager → Claude Service -->
+  <line x1="150" y1="920" x2="150" y2="1020" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <text x="165" y="978" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#475569">assembled prompt</text>
+
+  <!-- Claude Service → Diff Engine -->
+  <line x1="150" y1="1300" x2="150" y2="1400" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <text x="165" y="1358" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#475569">proposed text</text>
+
+  <!-- Diff Engine → Diff Decorations -->
+  <line x1="150" y1="1660" x2="150" y2="1740" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <text x="165" y="1708" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#475569">DiffChunk[]</text>
+
+  <!-- Diff Decorations → User Review -->
+  <line x1="150" y1="2020" x2="150" y2="2120" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <text x="165" y="2078" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#475569">rendered diff UI</text>
+
+  <!-- Settings → Manager (config) -->
+  <line x1="560" y1="710" x2="380" y2="770" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="478" y="730" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#475569" text-anchor="middle">config</text>
+
+  <!-- Settings → Claude Service (claudePath, model, timeout) -->
+  <line x1="560" y1="850" x2="380" y2="1160" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="490" y="985" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#475569">claudePath, model,</text>
+  <text x="490" y="1008" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#475569">timeout</text>
+
+  <!-- State Machine → Manager (state transitions) -->
+  <line x1="-440" y1="780" x2="-80" y2="770" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="-260" y="762" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#475569" text-anchor="middle">state transitions</text>
+
+  <!-- User Review → Manager (accept/reject feedback loop) -->
+  <path d="M -80 2220 L -250 2220 L -250 770 L -80 770" fill="none" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arrowhead-red)"/>
+  <text x="-265" y="1500" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#ef4444" text-anchor="middle" transform="rotate(-90, -265, 1500)">accept / reject</text>
+
+  <!-- Offset Tracking → User Review (offset shifts) -->
+  <line x1="560" y1="1880" x2="380" y2="2220" stroke="#22c55e" stroke-width="2.5" marker-end="url(#arrowhead-green)"/>
+  <text x="485" y="2060" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#22c55e" text-anchor="middle">offset shifts</text>
+</svg>

@@ -1,0 +1,165 @@
+/* %%ai marker widget */
+.ai-annotate-marker {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  padding: var(--size-4-1) var(--size-4-3);
+  border-radius: var(--radius-s);
+  background: rgba(var(--interactive-accent-rgb), 0.08);
+  border: 1px solid rgba(var(--interactive-accent-rgb), 0.2);
+  font-size: var(--font-ui-small);
+  margin: var(--size-4-1) 0;
+}
+
+.ai-annotate-marker-label {
+  color: var(--interactive-accent);
+  font-weight: var(--font-semibold);
+  font-family: var(--font-monospace);
+}
+
+.ai-annotate-marker-instruction {
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.ai-annotate-marker-status {
+  color: var(--text-warning);
+  font-size: var(--font-ui-smaller);
+}
+
+.ai-annotate-marker-process,
+.ai-annotate-marker-cancel {
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-ui-smaller);
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-annotate-marker-process {
+  background: rgba(var(--interactive-accent-rgb), 0.15);
+  color: var(--interactive-accent);
+}
+
+.ai-annotate-marker-process:hover {
+  background: rgba(var(--interactive-accent-rgb), 0.25);
+}
+
+.ai-annotate-marker-cancel {
+  background: rgba(var(--text-error-rgb), 0.15);
+  color: var(--text-error);
+}
+
+.ai-annotate-marker-cancel:hover {
+  background: rgba(var(--text-error-rgb), 0.25);
+}
+
+/* Review bar */
+.ai-annotate-review-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+  background: rgba(var(--interactive-accent-rgb), 0.1);
+  font-size: var(--font-ui-smaller);
+  margin-bottom: var(--size-4-1);
+}
+
+.ai-annotate-review-label {
+  color: var(--interactive-accent);
+}
+
+.ai-annotate-review-spacer {
+  flex: 1;
+}
+
+.ai-annotate-accept-btn,
+.ai-annotate-reject-btn {
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+  border: none;
+  cursor: pointer;
+  font-weight: var(--font-semibold);
+  font-size: var(--font-ui-smaller);
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-annotate-accept-btn {
+  background: var(--color-green);
+  color: var(--text-on-accent);
+}
+
+.ai-annotate-accept-btn:hover {
+  background: var(--color-green);
+  opacity: 0.85;
+}
+
+.ai-annotate-reject-btn {
+  background: var(--text-error);
+  color: var(--text-on-accent);
+}
+
+.ai-annotate-reject-btn:hover {
+  background: var(--text-error);
+  opacity: 0.85;
+}
+
+/* Diff content */
+.ai-annotate-diff-content {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  padding: var(--size-4-2) var(--size-4-3);
+  margin: var(--size-4-1) 0;
+  background: var(--background-secondary);
+}
+
+.ai-annotate-diff-interleaved {
+  line-height: var(--line-height-normal);
+  white-space: pre-wrap;
+}
+
+.ai-annotate-diff-removed {
+  background: rgba(var(--text-error-rgb), 0.15);
+  color: var(--text-error);
+  text-decoration: line-through;
+}
+
+.ai-annotate-diff-added {
+  background: rgba(var(--color-green-rgb), 0.15);
+  color: var(--color-green);
+}
+
+.ai-annotate-diff-context {
+  color: var(--text-muted);
+}
+
+.ai-annotate-diff-prefix {
+  font-weight: var(--font-semibold);
+  margin-right: 2px;
+  user-select: none;
+}
+
+/* Instruction modal textarea */
+.ai-annotate-instruction-input {
+  width: 100%;
+  margin-bottom: var(--size-4-3);
+}
+
+/* Focus indicators (MANDATORY per accessibility guidelines) */
+.ai-annotate-marker-process:focus-visible,
+.ai-annotate-marker-cancel:focus-visible,
+.ai-annotate-accept-btn:focus-visible,
+.ai-annotate-reject-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}

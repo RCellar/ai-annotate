@@ -1,0 +1,9 @@
+{
+  "id": "ai-annotate",
+  "name": "AI Annotate",
+  "version": "0.2.0",
+  "minAppVersion": "1.5.0",
+  "description": "Annotate markdown with inline instructions that Claude processes into suggested edits.",
+  "author": "RCellar",
+  "isDesktopOnly": true
+}

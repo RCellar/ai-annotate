@@ -1,0 +1,31 @@
+{
+	"nodes":[
+		{"id":"f1a0b2c3d4e5000d","type":"group","x":-320,"y":200,"width":740,"height":2220,"label":"Core Pipeline"},
+		{"id":"f1a0b2c3d4e5000c","type":"text","text":"# AI Annotate Plugin — Architecture","x":-80,"y":-280,"width":460,"height":80},
+		{"id":"f1a0b2c3d4e50001","type":"text","text":"## Inline Marker\n\nUser writes `%%ai <instruction> %%` in their note, then runs **Process annotation at cursor** or **Process all annotations**","x":-320,"y":-140,"width":340,"height":160,"color":"2"},
+		{"id":"f1a0b2c3d4e50002","type":"text","text":"## Selection\n\nUser selects text, runs **Annotate selection**, and enters instruction in the `InstructionModal` dialog","x":280,"y":-140,"width":340,"height":160,"color":"2"},
+		{"id":"f1a0b2c3d4e50003","type":"text","text":"## Annotation Parser\n`annotation-parser.ts`\n\n- Detects `%%ai...%%` markers via regex\n- Skips markers inside code blocks\n- `findTargetRange()` walks backward to nearest heading\n- `createSelectionAnnotation()` for selections\n- Returns `Annotation[]` with target ranges","x":-80,"y":240,"width":460,"height":280,"color":"5"},
+		{"id":"f1a0b2c3d4e50004","type":"text","text":"## Annotation Manager\n`annotation-manager.ts`\n\n- Stateful coordinator (`Map<id, Annotation>`)\n- `assemblePrompt()` builds numbered-line prompt with `<!-- TARGET START/END -->` delimiters\n- `processAnnotation()` orchestrates lifecycle\n- `adjustOffsetsAfterEdit()` shifts annotations after accepts\n- Tracks `activeCancels` for in-flight requests","x":-80,"y":620,"width":460,"height":300,"color":"5"},
+		{"id":"f1a0b2c3d4e50005","type":"text","text":"## Claude Service\n`claude-service.ts`\n\n- Spawns CLI:\n  `claude -p --output-format stream-json`\n- Parses newline-delimited JSON stream\n- `sanitizeResponse()` strips fences and preambles\n- Configurable timeout and model override\n- Returns `{ promise, cancel }` tuple","x":-80,"y":1020,"width":460,"height":280,"color":"6"},
+		{"id":"f1a0b2c3d4e50009","type":"text","text":"## Settings\n`settings.ts`\n\n| Setting | Default |\n|---|---|\n| `claudePath` | `claude` |\n| `timeout` | `60s` |\n| `systemPrompt` | *(detailed)* |\n| `model` | *(empty)* |","x":560,"y":620,"width":340,"height":300,"color":"3"},
+		{"id":"f1a0b2c3d4e5000a","type":"text","text":"## State Machine\n`types.ts`\n\n```\ncreated\n  → pending\n    → processing\n      → review\n        → accepted\n        → rejected\n```\n\nSources: `inline` | `selection`","x":-800,"y":620,"width":360,"height":320,"color":"6"},
+		{"id":"f1a0b2c3d4e5000b","type":"text","text":"## Offset Tracking\n\nAfter each accept:\n1. Compute `delta = newLen - oldLen - markerLen`\n2. Shift annotations where `targetFrom > editFrom`\n3. Shared refs prevent double-shifting in batch mode","x":560,"y":1740,"width":340,"height":280,"color":"4"},
+		{"id":"f1a0b2c3d4e50006","type":"text","text":"## Diff Engine\n`diff-engine.ts`\n\n- Tokenizes text into words and whitespace\n- LCS (Longest Common Subsequence) via DP\n- Produces `DiffChunk[]`:\n  `keep` | `add` | `remove`\n- Merges consecutive chunks of same type","x":-80,"y":1400,"width":460,"height":260,"color":"5"},
+		{"id":"f1a0b2c3d4e50007","type":"text","text":"## Diff Decorations\n`diff-decorations.ts`\n\n- CM6 `StateField` managing decorations\n- `ReviewButtonsWidget` — accept/reject bar\n- `DiffContentWidget` — inline colored diff\n- `addDiffEffect` / `removeDiffEffect`\n- `reviewActionHandler` bridges widgets → plugin","x":-80,"y":1740,"width":460,"height":280,"color":"4"},
+		{"id":"f1a0b2c3d4e50008","type":"text","text":"## User Review\n\n**Accept** → replaces original with proposed text, removes marker, adjusts offsets\n\n**Reject** → restores original text, removes diff UI","x":-80,"y":2120,"width":460,"height":200,"color":"1"}
+	],
+	"edges":[
+		{"id":"e1a0b2c3d4e50001","fromNode":"f1a0b2c3d4e50001","fromSide":"bottom","toNode":"f1a0b2c3d4e50003","toSide":"top","label":"%%ai...%%"},
+		{"id":"e1a0b2c3d4e50002","fromNode":"f1a0b2c3d4e50002","fromSide":"bottom","toNode":"f1a0b2c3d4e50003","toSide":"top","label":"selection + instruction"},
+		{"id":"e1a0b2c3d4e50003","fromNode":"f1a0b2c3d4e50003","fromSide":"bottom","toNode":"f1a0b2c3d4e50004","toSide":"top","label":"Annotation objects"},
+		{"id":"e1a0b2c3d4e50004","fromNode":"f1a0b2c3d4e50004","fromSide":"bottom","toNode":"f1a0b2c3d4e50005","toSide":"top","label":"assembled prompt"},
+		{"id":"e1a0b2c3d4e50005","fromNode":"f1a0b2c3d4e50005","fromSide":"bottom","toNode":"f1a0b2c3d4e50006","toSide":"top","label":"proposed text"},
+		{"id":"e1a0b2c3d4e50006","fromNode":"f1a0b2c3d4e50006","fromSide":"bottom","toNode":"f1a0b2c3d4e50007","toSide":"top","label":"DiffChunk[]"},
+		{"id":"e1a0b2c3d4e50007","fromNode":"f1a0b2c3d4e50007","fromSide":"bottom","toNode":"f1a0b2c3d4e50008","toSide":"top","label":"rendered diff UI"},
+		{"id":"e1a0b2c3d4e50008","fromNode":"f1a0b2c3d4e50009","fromSide":"left","toNode":"f1a0b2c3d4e50004","toSide":"right","label":"config"},
+		{"id":"e1a0b2c3d4e50009","fromNode":"f1a0b2c3d4e50009","fromSide":"left","toNode":"f1a0b2c3d4e50005","toSide":"right","label":"claudePath, model, timeout"},
+		{"id":"e1a0b2c3d4e5000a","fromNode":"f1a0b2c3d4e5000a","fromSide":"right","toNode":"f1a0b2c3d4e50004","toSide":"left","label":"state transitions"},
+		{"id":"e1a0b2c3d4e5000b","fromNode":"f1a0b2c3d4e50008","fromSide":"left","toNode":"f1a0b2c3d4e50004","toSide":"left","color":"1","label":"accept/reject"},
+		{"id":"e1a0b2c3d4e5000c","fromNode":"f1a0b2c3d4e5000b","fromSide":"left","toNode":"f1a0b2c3d4e50008","toSide":"right","color":"4","label":"offset shifts"}
+	]
+}
