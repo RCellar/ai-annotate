@@ -108,6 +108,7 @@ export default class AIAnnotatePlugin extends Plugin {
   }
 
   onunload() {
+    this.manager.cancelAll();
     clearReviewActionHandler();
   }
 
@@ -290,10 +291,11 @@ export default class AIAnnotatePlugin extends Plugin {
       const markerFromPos = editor.offsetToPos(adjustedMarkerFrom);
       const lineNum = markerFromPos.line;
       const lineStart = editor.posToOffset({ line: lineNum, ch: 0 });
-      const nextLineStart = editor.posToOffset({
-        line: lineNum + 1,
-        ch: 0,
-      });
+      const docLength = editor.getValue().length;
+      const nextLineStart = Math.min(
+        editor.posToOffset({ line: lineNum + 1, ch: 0 }),
+        docLength
+      );
 
       const lineText = editor.getRange(
         editor.offsetToPos(lineStart),
@@ -335,7 +337,7 @@ export default class AIAnnotatePlugin extends Plugin {
       // object references, adjusting both would double-shift the offsets.
       if (
         pending.id !== annotationId &&
-        pending.targetFrom > annotation.targetFrom &&
+        pending.targetFrom >= annotation.targetFrom &&
         !this.manager.hasAnnotation(pending.id)
       ) {
         pending.targetFrom += totalDelta;

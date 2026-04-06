@@ -10,19 +10,41 @@ interface CodeRange {
 function findCodeRanges(docText: string): CodeRange[] {
   const ranges: CodeRange[] = [];
 
-  // Fenced code blocks: ``` or ~~~
-  const fenceRegex = /^(`{3,}|~{3,}).*\n[\s\S]*?\n\1\s*$/gm;
-  let match: RegExpExecArray | null;
-  fenceRegex.lastIndex = 0;
-  while ((match = fenceRegex.exec(docText)) !== null) {
-    ranges.push({ from: match.index, to: match.index + match[0].length });
+  // Fenced code blocks: line-scanner approach to avoid backtracking
+  const lines = docText.split("\n");
+  let offset = 0;
+  let fenceStart = -1;
+  let fenceChar = "";
+  let fenceLen = 0;
+
+  for (const line of lines) {
+    if (fenceStart === -1) {
+      const openMatch = line.match(/^(`{3,}|~{3,})/);
+      if (openMatch) {
+        fenceStart = offset;
+        fenceChar = openMatch[1]![0]!;
+        fenceLen = openMatch[1]!.length;
+      }
+    } else {
+      const pat = fenceChar === "`"
+        ? new RegExp("^`{" + fenceLen + ",}\\s*$")
+        : new RegExp("^~{" + fenceLen + ",}\\s*$");
+      if (pat.test(line)) {
+        ranges.push({ from: fenceStart, to: offset + line.length });
+        fenceStart = -1;
+      }
+    }
+    offset += line.length + 1;
   }
 
   // Inline code: `...`
   const inlineRegex = /`[^`\n]+`/g;
+  let match: RegExpExecArray | null;
   inlineRegex.lastIndex = 0;
   while ((match = inlineRegex.exec(docText)) !== null) {
-    ranges.push({ from: match.index, to: match.index + match[0].length });
+    if (!isInsideCode(match.index, ranges)) {
+      ranges.push({ from: match.index, to: match.index + match[0].length });
+    }
   }
 
   return ranges;

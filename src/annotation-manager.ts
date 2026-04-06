@@ -73,10 +73,12 @@ export class AnnotationManager {
     if (result.error) {
       annotation.state = "created";
       onStateChange(annotation);
-      new Notice(
-        `AI Annotate: ${friendlyError(result.error, settings.claudePath, settings.timeout)}`,
-        8000
-      );
+      if (result.error !== "Cancelled") {
+        new Notice(
+          `AI Annotate: ${friendlyError(result.error, settings.claudePath, settings.timeout)}`,
+          8000
+        );
+      }
       return annotation;
     }
 
@@ -94,6 +96,13 @@ export class AnnotationManager {
     onStateChange(annotation);
 
     return annotation;
+  }
+
+  cancelAll(): void {
+    for (const cancel of this.activeCancels.values()) {
+      cancel();
+    }
+    this.activeCancels.clear();
   }
 
   cancelAnnotation(annotationId: string): void {

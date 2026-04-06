@@ -216,6 +216,25 @@ export const diffStateField = StateField.define<DiffFieldState>({
     let changed = false;
     let annotations = state.annotations;
 
+    // Map annotation positions through document changes
+    if (tr.docChanged && annotations.size > 0) {
+      annotations = new Map(annotations);
+      for (const [id, ann] of annotations) {
+        annotations.set(id, {
+          ...ann,
+          targetFrom: tr.changes.mapPos(ann.targetFrom),
+          targetTo: tr.changes.mapPos(ann.targetTo),
+          ...(ann.markerFrom !== undefined && {
+            markerFrom: tr.changes.mapPos(ann.markerFrom),
+          }),
+          ...(ann.markerTo !== undefined && {
+            markerTo: tr.changes.mapPos(ann.markerTo),
+          }),
+        });
+      }
+      changed = true;
+    }
+
     for (const effect of tr.effects) {
       if (effect.is(addDiffEffect)) {
         if (!changed) {
