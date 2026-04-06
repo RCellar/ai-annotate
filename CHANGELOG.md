@@ -43,6 +43,11 @@
 - Floating promises are properly handled with `void` operator.
 - Removed unnecessary type assertion in internal CodeMirror view accessor.
 - `%%ai` markers inside unclosed fenced code blocks are now suppressed, matching Obsidian's own rendering behaviour.
+- Claude CLI path setting falls back to the default when cleared to an empty string.
+- Diff decorations with collapsed ranges (e.g., target deleted during review) are filtered out, preventing orphaned review buttons.
+- Decoration sort includes `startSide`, preventing a CM6 crash when multiple annotations share the same position.
+- Processing an annotation with no target text (e.g., `%%ai` immediately after a heading) now shows a notice instead of sending a degenerate prompt.
+- Batch processing: `originalText` is re-read from the live document after earlier accepts, so the diff display matches current content.
 
 ## 0.1.0 (2026-04-05)
 
