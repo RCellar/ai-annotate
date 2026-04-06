@@ -1,4 +1,4 @@
-import { Editor, MarkdownView, Modal, Notice, Plugin } from "obsidian";
+import { Editor, MarkdownView, Menu, Modal, Notice, Plugin } from "obsidian";
 import { spawn } from "child_process";
 import { EditorView } from "@codemirror/view";
 import {
@@ -174,6 +174,85 @@ export default class AIAnnotatePlugin extends Plugin {
         editor.setCursor(editor.offsetToPos(prev.targetFrom));
       },
     });
+
+    // Right-click context menu
+    this.registerEvent(
+      this.app.workspace.on("editor-menu", (menu: Menu, editor: Editor) => {
+        const markdownView =
+          this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (!markdownView) return;
+
+        const offset = editor.posToOffset(editor.getCursor());
+
+        // "Annotate selection" — shown when there is a selection
+        if (editor.getSelection()) {
+          menu.addItem((item) => {
+            item
+              .setTitle("Annotate selection")
+              .setIcon("wand")
+              .onClick(() => {
+                this.annotateSelection(editor, markdownView);
+              });
+          });
+        }
+
+        // "Process this annotation" — shown when cursor is near a %%ai marker
+        if (!this.processing) {
+          const docText = editor.getValue();
+          const annotations = parseAnnotations(docText);
+          const nearby = annotations.find(
+            (a) =>
+              (a.markerFrom !== undefined &&
+                a.markerTo !== undefined &&
+                offset >= a.markerFrom &&
+                offset <= a.markerTo) ||
+              (offset >= a.targetFrom && offset <= a.targetTo)
+          );
+          if (nearby) {
+            menu.addItem((item) => {
+              item
+                .setTitle("Process this annotation")
+                .setIcon("play")
+                .onClick(() => {
+                  this.processing = true;
+                  this.setStatus("AI: processing...");
+                  void this.processAnnotation(
+                    nearby,
+                    editor,
+                    markdownView
+                  ).finally(() => {
+                    this.processing = false;
+                    this.setStatus("");
+                  });
+                });
+            });
+          }
+        }
+
+        // "Accept change" / "Reject change" — shown when cursor is in a review annotation
+        const reviewAnn = this.manager
+          .getReviewAnnotations()
+          .find((a) => offset >= a.targetFrom && offset <= a.targetTo);
+        if (reviewAnn) {
+          menu.addItem((item) => {
+            item
+              .setTitle("Accept change")
+              .setIcon("check")
+              .onClick(() => {
+                this.acceptAnnotation(reviewAnn.id, markdownView);
+              });
+          });
+          menu.addItem((item) => {
+            item
+              .setTitle("Reject change")
+              .setIcon("x")
+              .onClick(() => {
+                this.rejectAnnotation(reviewAnn.id, markdownView);
+              });
+          });
+        }
+      })
+    );
 
     this.checkCliAvailability();
 
