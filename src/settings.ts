@@ -12,6 +12,7 @@ export interface AIAnnotateSettings {
   contextStrategy: ContextStrategy;
   extraArgs: string;
   envVars: string;
+  recentInstructions: string[];
 }
 
 export const DEFAULT_SETTINGS: AIAnnotateSettings = {
@@ -22,6 +23,7 @@ export const DEFAULT_SETTINGS: AIAnnotateSettings = {
   contextStrategy: "neighbors",
   extraArgs: "",
   envVars: "",
+  recentInstructions: [],
 };
 
 export class AIAnnotateSettingTab extends PluginSettingTab {

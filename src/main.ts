@@ -431,24 +431,35 @@ export default class AIAnnotatePlugin extends Plugin {
     const from = editor.posToOffset(editor.getCursor("from"));
     const to = editor.posToOffset(editor.getCursor("to"));
 
-    const modal = new InstructionModal(this.app, (instruction) => {
-      if (this.processing) {
-        new Notice("AI annotate: already processing. Wait for the current annotation to finish.");
-        return;
-      }
-      const annotation = createSelectionAnnotation(
-        instruction,
-        selection,
-        from,
-        to
-      );
-      this.processing = true;
-      this.setStatus("AI: processing...");
-      void this.processAnnotation(annotation, editor, view).finally(() => {
-        this.processing = false;
-        this.setStatus("");
-      });
-    });
+    const modal = new InstructionModal(
+      this.app,
+      (instruction) => {
+        // Save to recent instructions (deduplicated, max 10)
+        this.settings.recentInstructions = [
+          instruction,
+          ...this.settings.recentInstructions.filter(i => i !== instruction),
+        ].slice(0, 10);
+        void this.saveSettings();
+
+        if (this.processing) {
+          new Notice("AI annotate: already processing. Wait for the current annotation to finish.");
+          return;
+        }
+        const annotation = createSelectionAnnotation(
+          instruction,
+          selection,
+          from,
+          to
+        );
+        this.processing = true;
+        this.setStatus("AI: processing...");
+        void this.processAnnotation(annotation, editor, view).finally(() => {
+          this.processing = false;
+          this.setStatus("");
+        });
+      },
+      this.settings.recentInstructions
+    );
     modal.open();
   }
 
@@ -581,13 +592,16 @@ export default class AIAnnotatePlugin extends Plugin {
 
 class InstructionModal extends Modal {
   private onSubmit: (instruction: string) => void;
+  private recentInstructions: string[];
 
   constructor(
     app: import("obsidian").App,
-    onSubmit: (instruction: string) => void
+    onSubmit: (instruction: string) => void,
+    recentInstructions: string[]
   ) {
     super(app);
     this.onSubmit = onSubmit;
+    this.recentInstructions = recentInstructions;
   }
 
   onOpen() {
@@ -605,6 +619,35 @@ class InstructionModal extends Modal {
         "aria-label": "Instruction for claude",
       },
     });
+
+    if (this.recentInstructions.length > 0) {
+      const historyContainer = contentEl.createDiv({
+        cls: "ai-annotate-instruction-history",
+      });
+      historyContainer.createSpan({
+        cls: "ai-annotate-history-label",
+        text: "Recent:",
+      });
+      for (const instruction of this.recentInstructions.slice(0, 5)) {
+        const chip = historyContainer.createEl("button", {
+          cls: "ai-annotate-history-chip",
+          text:
+            instruction.length > 40
+              ? instruction.slice(0, 40) + "..."
+              : instruction,
+        });
+        chip.addEventListener("click", () => {
+          input.value = instruction;
+          input.focus();
+        });
+      }
+    }
+
+    contentEl.createDiv({
+      cls: "ai-annotate-modal-hint",
+      text: "Ctrl+Enter to submit",
+    });
+
     const submitBtn = contentEl.createEl("button", {
       cls: "mod-cta",
       text: "Process",

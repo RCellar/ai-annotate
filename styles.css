@@ -155,6 +155,40 @@
   margin-bottom: var(--size-4-3);
 }
 
+/* Instruction history */
+.ai-annotate-instruction-history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-1);
+  align-items: center;
+  margin-bottom: var(--size-4-2);
+}
+
+.ai-annotate-history-label {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.ai-annotate-history-chip {
+  font-size: var(--font-ui-smaller);
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+.ai-annotate-history-chip:hover {
+  background: var(--background-modifier-hover);
+}
+
+.ai-annotate-modal-hint {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin-bottom: var(--size-4-2);
+}
+
 /* Focus indicators (MANDATORY per accessibility guidelines) */
 .ai-annotate-marker-process:focus-visible,
 .ai-annotate-marker-cancel:focus-visible,
