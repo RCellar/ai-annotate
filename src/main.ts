@@ -22,6 +22,7 @@ export default class AIAnnotatePlugin extends Plugin {
   manager = new AnnotationManager();
   private pendingBatchAnnotations: Annotation[] = [];
   private processing = false;
+  private statusBarEl: HTMLElement | null = null;
 
   async onload() {
     await this.loadSettings();
@@ -105,11 +106,20 @@ export default class AIAnnotatePlugin extends Plugin {
     });
 
     this.checkCliAvailability();
+
+    this.statusBarEl = this.addStatusBarItem();
+    this.statusBarEl.setText("");
   }
 
   onunload() {
     this.manager.cancelAll();
     clearReviewActionHandler();
+  }
+
+  private setStatus(text: string): void {
+    if (this.statusBarEl) {
+      this.statusBarEl.setText(text);
+    }
   }
 
   private checkCliAvailability(): void {
@@ -183,8 +193,10 @@ export default class AIAnnotatePlugin extends Plugin {
     }
 
     this.processing = true;
+    this.setStatus("AI: processing...");
     void this.processAnnotation(annotation, editor, view).finally(() => {
       this.processing = false;
+      this.setStatus("");
     });
   }
 
@@ -207,12 +219,14 @@ export default class AIAnnotatePlugin extends Plugin {
     this.processing = true;
     this.pendingBatchAnnotations = annotations;
     try {
-      for (const annotation of annotations) {
-        await this.processAnnotation(annotation, editor, view);
+      for (let i = 0; i < annotations.length; i++) {
+        this.setStatus(`AI: processing ${i + 1}/${annotations.length}...`);
+        await this.processAnnotation(annotations[i]!, editor, view);
       }
     } finally {
       this.pendingBatchAnnotations = [];
       this.processing = false;
+      this.setStatus("");
     }
   }
 
@@ -239,6 +253,8 @@ export default class AIAnnotatePlugin extends Plugin {
           cmView.dispatch({
             effects: addDiffEffect.of({ annotation: updated }),
           });
+          const reviewCount = this.manager.getReviewAnnotations().length;
+          this.setStatus(reviewCount > 0 ? `AI: ${reviewCount} pending review` : "");
         }
       }
     );
@@ -268,8 +284,10 @@ export default class AIAnnotatePlugin extends Plugin {
         to
       );
       this.processing = true;
+      this.setStatus("AI: processing...");
       void this.processAnnotation(annotation, editor, view).finally(() => {
         this.processing = false;
+        this.setStatus("");
       });
     });
     modal.open();
@@ -368,6 +386,9 @@ export default class AIAnnotatePlugin extends Plugin {
         );
       }
     }
+
+    const reviewCount = this.manager.getReviewAnnotations().length;
+    this.setStatus(reviewCount > 0 ? `AI: ${reviewCount} pending review` : "");
   }
 
   private rejectAnnotation(annotationId: string, view: MarkdownView) {
@@ -378,6 +399,9 @@ export default class AIAnnotatePlugin extends Plugin {
     cmView.dispatch({
       effects: removeDiffEffect.of({ annotationId }),
     });
+
+    const reviewCount = this.manager.getReviewAnnotations().length;
+    this.setStatus(reviewCount > 0 ? `AI: ${reviewCount} pending review` : "");
   }
 
   private getCmView(view: MarkdownView): EditorView | null {
