@@ -15,6 +15,15 @@
 - **Extra CLI arguments** — New setting to pass additional arguments to the spawned Claude process (e.g., `--max-turns 5`).
 - **Environment variables** — New setting to define environment variables (one KEY=VALUE per line) merged into the CLI process environment.
 - **CLI reference link** — Advanced settings section links to the Claude CLI reference documentation.
+- **Status bar indicator** — Shows processing state ("AI: processing 2/5..."), streaming status ("AI: receiving response..."), and pending review count ("AI: 3 pending review").
+- **Completion notice and scroll** — A Notice appears when changes are ready for review, and the editor scrolls to the diff.
+- **Keyboard review commands** — "Accept change at cursor", "Reject change at cursor", "Go to next change", and "Go to previous change" for keyboard-driven review workflows.
+- **Right-click context menu** — Annotate selection, process annotation, accept, and reject available from the editor context menu.
+- **Instruction history** — The selection annotation modal shows up to 5 recent instructions as clickable suggestions, with a "Ctrl+Enter to submit" hint.
+- **Atomic undo** — Accepting a change groups the text replacement and marker removal into a single undo step.
+- **Streaming status** — Status bar updates as Claude streams its response, using the existing `onChunk` callback.
+- **Edit guard** — Document edits inside active review regions are blocked to prevent position corruption.
+- **Per-annotation model override** — Use `%%ai model:claude-haiku-4-5-20251001 instruction %%` to override the model for a single annotation.
 
 ### Fixes
 

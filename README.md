@@ -87,6 +87,16 @@ The diff appears inline over the selected text with the same accept/reject contr
 
 Scatter multiple `%%ai` markers throughout a document, then run **"Process all annotations"** from the command palette. Each annotation is processed sequentially, and you can accept or reject each one individually — even while others are still being processed.
 
+### Per-annotation model override
+
+Override the Claude model for a single annotation by adding a `model:` prefix:
+
+```markdown
+%%ai model:claude-haiku-4-5-20251001 Fix grammar %%
+```
+
+The model name must match a valid Claude model ID. If omitted, the global model setting is used.
+
 ### Accept all / Reject all
 
 After processing multiple annotations, use **"Accept all changes"** or **"Reject all changes"** from the command palette to resolve them all at once.
@@ -100,8 +110,14 @@ After processing multiple annotations, use **"Accept all changes"** or **"Reject
 | Annotate selection | Open instruction modal for the currently selected text |
 | Accept all changes | Accept all pending proposed changes |
 | Reject all changes | Reject all pending proposed changes |
+| Accept change at cursor | Accept the proposed change at the current cursor position |
+| Reject change at cursor | Reject the proposed change at the current cursor position |
+| Go to next change | Navigate to the next pending change |
+| Go to previous change | Navigate to the previous pending change |
 
 No default hotkeys are assigned. Bind them in **Settings > Hotkeys** to your preference.
+
+> **Tip:** Right-click in the editor to access annotation commands from the context menu — annotate a selection, process a nearby marker, or accept/reject a change.
 
 > **Note:** `%%ai` markers inside fenced code blocks and inline code are ignored, so you can safely document the syntax without triggering processing.
 
