@@ -249,13 +249,23 @@ export default class AIAnnotatePlugin extends Plugin {
       docText,
       this.settings,
       (updated) => {
+        if (updated.state === "processing") {
+          this.setStatus("AI: waiting for response...");
+        }
         if (updated.state === "review") {
           cmView.dispatch({
             effects: addDiffEffect.of({ annotation: updated }),
           });
+          cmView.dispatch({
+            effects: EditorView.scrollIntoView(updated.targetFrom),
+          });
+          new Notice("Changes ready for review.");
           const reviewCount = this.manager.getReviewAnnotations().length;
           this.setStatus(reviewCount > 0 ? `AI: ${reviewCount} pending review` : "");
         }
+      },
+      (_annotationId: string, _partialText: string) => {
+        this.setStatus("AI: receiving response...");
       }
     );
   }
