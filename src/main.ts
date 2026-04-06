@@ -21,6 +21,7 @@ export default class AIAnnotatePlugin extends Plugin {
   settings: AIAnnotateSettings = DEFAULT_SETTINGS;
   manager = new AnnotationManager();
   private pendingBatchAnnotations: Annotation[] = [];
+  private processing = false;
 
   async onload() {
     await this.loadSettings();
@@ -114,14 +115,16 @@ export default class AIAnnotatePlugin extends Plugin {
     const proc = spawn(this.settings.claudePath, ["--version"], {
       stdio: ["ignore", "pipe", "pipe"],
     });
+    let errored = false;
     proc.on("error", () => {
+      errored = true;
       new Notice(
         `AI annotate: claude CLI not found at "${this.settings.claudePath}". Check settings > AI annotate.`,
         8000
       );
     });
     proc.on("close", (code) => {
-      if (code !== 0) {
+      if (!errored && code !== 0) {
         new Notice(
           `AI annotate: claude CLI at "${this.settings.claudePath}" exited with an error. Run "claude login" in your terminal if not authenticated.`,
           8000
@@ -131,6 +134,11 @@ export default class AIAnnotatePlugin extends Plugin {
   }
 
   private processAnnotationAtCursor(editor: Editor, view: MarkdownView) {
+    if (this.processing) {
+      new Notice("AI annotate: already processing. Wait for the current annotation to finish.");
+      return;
+    }
+
     const cursor = editor.getCursor();
     const docText = editor.getValue();
     const offset = editor.posToOffset(cursor);
@@ -173,10 +181,18 @@ export default class AIAnnotatePlugin extends Plugin {
       return;
     }
 
-    void this.processAnnotation(annotation, editor, view);
+    this.processing = true;
+    void this.processAnnotation(annotation, editor, view).finally(() => {
+      this.processing = false;
+    });
   }
 
   private async processAllAnnotations(editor: Editor, view: MarkdownView) {
+    if (this.processing) {
+      new Notice("AI annotate: already processing. Wait for the current batch to finish.");
+      return;
+    }
+
     const docText = editor.getValue();
     const annotations = parseAnnotations(docText);
 
@@ -187,11 +203,16 @@ export default class AIAnnotatePlugin extends Plugin {
 
     new Notice(`Processing ${annotations.length} annotation(s)...`);
 
+    this.processing = true;
     this.pendingBatchAnnotations = annotations;
-    for (const annotation of annotations) {
-      await this.processAnnotation(annotation, editor, view);
+    try {
+      for (const annotation of annotations) {
+        await this.processAnnotation(annotation, editor, view);
+      }
+    } finally {
+      this.pendingBatchAnnotations = [];
+      this.processing = false;
     }
-    this.pendingBatchAnnotations = [];
   }
 
   private async processAnnotation(

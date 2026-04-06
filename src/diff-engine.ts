@@ -1,5 +1,10 @@
 import type { DiffChunk } from "./types";
 
+interface LCSPair {
+  oi: number;
+  pi: number;
+}
+
 export function computeDiff(original: string, proposed: string): DiffChunk[] {
   const origWords = tokenize(original);
   const propWords = tokenize(proposed);
@@ -10,16 +15,16 @@ export function computeDiff(original: string, proposed: string): DiffChunk[] {
   let oi = 0;
   let pi = 0;
 
-  for (const common of lcs) {
-    while (oi < origWords.length && origWords[oi] !== common) {
+  for (const pair of lcs) {
+    while (oi < pair.oi) {
       pushChunk(chunks, "remove", origWords[oi]!);
       oi++;
     }
-    while (pi < propWords.length && propWords[pi] !== common) {
+    while (pi < pair.pi) {
       pushChunk(chunks, "add", propWords[pi]!);
       pi++;
     }
-    pushChunk(chunks, "keep", common);
+    pushChunk(chunks, "keep", origWords[pair.oi]!);
     oi++;
     pi++;
   }
@@ -46,7 +51,7 @@ function tokenize(text: string): string[] {
   return tokens;
 }
 
-function lcsDP(a: string[], b: string[]): string[] {
+function lcsDP(a: string[], b: string[]): LCSPair[] {
   const n = a.length;
   const m = b.length;
   const dp: number[][] = Array.from({ length: n + 1 }, () =>
@@ -63,12 +68,12 @@ function lcsDP(a: string[], b: string[]): string[] {
     }
   }
 
-  const result: string[] = [];
+  const result: LCSPair[] = [];
   let i = n;
   let j = m;
   while (i > 0 && j > 0) {
     if (a[i - 1] === b[j - 1]) {
-      result.unshift(a[i - 1]!);
+      result.unshift({ oi: i - 1, pi: j - 1 });
       i--;
       j--;
     } else if (dp[i - 1]![j]! > dp[i]![j - 1]!) {

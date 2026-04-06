@@ -129,7 +129,7 @@ export class AnnotationManager {
 
   adjustOffsetsAfterEdit(editFrom: number, delta: number): void {
     for (const annotation of this.annotations.values()) {
-      if (annotation.targetFrom > editFrom) {
+      if (annotation.targetFrom >= editFrom) {
         annotation.targetFrom += delta;
         annotation.targetTo += delta;
         if (annotation.markerFrom !== undefined) {
@@ -210,13 +210,26 @@ export class AnnotationManager {
         toLine = sectionEnd;
       } else {
         // "neighbors" — include previous and next sections
+        // Find the index of the heading that starts the current section.
+        // If the target is before the first heading, sectionStart is 0
+        // and won't be in headingLines — treat as index -1.
         const sectionIdx = headingLines.indexOf(sectionStart);
-        fromLine =
-          sectionIdx > 0 ? headingLines[sectionIdx - 1]! : 0;
-        toLine =
-          sectionIdx + 2 < headingLines.length
-            ? headingLines[sectionIdx + 2]! - 1
-            : lines.length - 1;
+        if (sectionIdx === -1) {
+          // Target is before the first heading — include from doc start
+          // through the end of the first heading's section
+          fromLine = 0;
+          toLine =
+            headingLines.length >= 2
+              ? headingLines[1]! - 1
+              : lines.length - 1;
+        } else {
+          fromLine =
+            sectionIdx > 0 ? headingLines[sectionIdx - 1]! : 0;
+          toLine =
+            sectionIdx + 2 < headingLines.length
+              ? headingLines[sectionIdx + 2]! - 1
+              : lines.length - 1;
+        }
       }
     }
 
