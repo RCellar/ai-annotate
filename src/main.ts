@@ -105,6 +105,76 @@ export default class AIAnnotatePlugin extends Plugin {
       },
     });
 
+    // Command: Accept change at cursor
+    this.addCommand({
+      id: "accept-at-cursor",
+      name: "Accept change at cursor",
+      editorCallback: (editor: Editor, view: MarkdownView) => {
+        const offset = editor.posToOffset(editor.getCursor());
+        const ann = this.manager
+          .getReviewAnnotations()
+          .find((a) => offset >= a.targetFrom && offset <= a.targetTo);
+        if (ann) {
+          this.acceptAnnotation(ann.id, view);
+        } else {
+          new Notice("No pending change at cursor.");
+        }
+      },
+    });
+
+    // Command: Reject change at cursor
+    this.addCommand({
+      id: "reject-at-cursor",
+      name: "Reject change at cursor",
+      editorCallback: (editor: Editor, view: MarkdownView) => {
+        const offset = editor.posToOffset(editor.getCursor());
+        const ann = this.manager
+          .getReviewAnnotations()
+          .find((a) => offset >= a.targetFrom && offset <= a.targetTo);
+        if (ann) {
+          this.rejectAnnotation(ann.id, view);
+        } else {
+          new Notice("No pending change at cursor.");
+        }
+      },
+    });
+
+    // Command: Go to next change
+    this.addCommand({
+      id: "next-change",
+      name: "Go to next change",
+      editorCallback: (editor: Editor) => {
+        const offset = editor.posToOffset(editor.getCursor());
+        const sorted = this.manager
+          .getReviewAnnotations()
+          .sort((a, b) => a.targetFrom - b.targetFrom);
+        if (sorted.length === 0) {
+          new Notice("No pending changes.");
+          return;
+        }
+        const next = sorted.find((a) => a.targetFrom > offset) ?? sorted[0]!;
+        editor.setCursor(editor.offsetToPos(next.targetFrom));
+      },
+    });
+
+    // Command: Go to previous change
+    this.addCommand({
+      id: "previous-change",
+      name: "Go to previous change",
+      editorCallback: (editor: Editor) => {
+        const offset = editor.posToOffset(editor.getCursor());
+        const sorted = this.manager
+          .getReviewAnnotations()
+          .sort((a, b) => b.targetFrom - a.targetFrom);
+        if (sorted.length === 0) {
+          new Notice("No pending changes.");
+          return;
+        }
+        const prev = sorted.find((a) => a.targetFrom < offset) ?? sorted[0]!;
+        editor.setCursor(editor.offsetToPos(prev.targetFrom));
+      },
+    });
+
     this.checkCliAvailability();
 
     this.statusBarEl = this.addStatusBarItem();
