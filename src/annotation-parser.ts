@@ -35,6 +35,12 @@ function findCodeRanges(docText: string): CodeRange[] {
     offset += line.length + 1;
   }
 
+  // If a fence opened but never closed, treat the rest of the document as
+  // code to match Obsidian's own rendering behaviour for unclosed fences.
+  if (fenceStart !== -1) {
+    ranges.push({ from: fenceStart, to: docText.length });
+  }
+
   // Inline code: `...`
   const inlineRegex = /`[^`\n]+`/g;
   let match: RegExpExecArray | null;
