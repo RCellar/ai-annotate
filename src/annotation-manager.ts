@@ -56,7 +56,7 @@ export class AnnotationManager {
         claudePath: settings.claudePath,
         timeout: settings.timeout,
         systemPrompt: settings.systemPrompt,
-        model: settings.model,
+        model: annotation.model || settings.model,
         extraArgs: settings.extraArgs,
         envVars: settings.envVars,
       },

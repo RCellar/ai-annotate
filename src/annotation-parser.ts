@@ -69,7 +69,16 @@ export function parseAnnotations(docText: string): Annotation[] {
     if (isInsideCode(markerFrom, codeRanges)) continue;
 
     const markerTo = match.index + match[0].length;
-    const instruction = (match[1] ?? "").trim();
+    const rawInstruction = (match[1] ?? "").trim();
+
+    // Parse optional model: prefix
+    let model: string | undefined;
+    let instruction = rawInstruction;
+    const modelMatch = rawInstruction.match(/^model:(\S+)\s+([\s\S]*)$/);
+    if (modelMatch) {
+      model = modelMatch[1];
+      instruction = (modelMatch[2] ?? "").trim();
+    }
 
     const { targetFrom, targetTo } = findTargetRange(docText, markerFrom);
     const originalText = docText.slice(targetFrom, targetTo);
@@ -84,6 +93,7 @@ export function parseAnnotations(docText: string): Annotation[] {
       source: "inline",
       markerFrom,
       markerTo,
+      model,
     });
   }
 

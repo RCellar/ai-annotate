@@ -21,6 +21,8 @@ export interface Annotation {
   /** For inline markers: the position range of the %%ai ... %% marker itself */
   markerFrom?: number;
   markerTo?: number;
+  /** Optional per-annotation model override parsed from %%ai model:xxx instruction %% */
+  model?: string;
 }
 
 export interface DiffChunk {
