@@ -53,6 +53,8 @@ export class AnnotationManager {
         timeout: settings.timeout,
         systemPrompt: settings.systemPrompt,
         model: settings.model,
+        extraArgs: settings.extraArgs,
+        envVars: settings.envVars,
       },
       (partialText: string) => {
         onChunk?.(annotation.id, partialText);

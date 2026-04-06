@@ -6,6 +6,8 @@ export interface ClaudeServiceOptions {
   timeout: number;
   systemPrompt: string;
   model: string;
+  extraArgs: string;
+  envVars: string;
 }
 
 export interface ClaudeResult {
@@ -36,6 +38,44 @@ export function sanitizeResponse(text: string): string {
   return result.trim();
 }
 
+export function parseArgs(input: string): string[] {
+  const args: string[] = [];
+  let current = "";
+  let inDouble = false;
+  let inSingle = false;
+
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i]!;
+    if (ch === '"' && !inSingle) {
+      inDouble = !inDouble;
+    } else if (ch === "'" && !inDouble) {
+      inSingle = !inSingle;
+    } else if (/\s/.test(ch) && !inDouble && !inSingle) {
+      if (current) {
+        args.push(current);
+        current = "";
+      }
+    } else {
+      current += ch;
+    }
+  }
+  if (current) args.push(current);
+  return args;
+}
+
+export function parseEnvVars(input: string): Record<string, string> {
+  const env: Record<string, string> = {};
+  for (const line of input.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIndex = trimmed.indexOf("=");
+    if (eqIndex > 0) {
+      env[trimmed.slice(0, eqIndex).trim()] = trimmed.slice(eqIndex + 1).trim();
+    }
+  }
+  return env;
+}
+
 export function invokeClaude(
   prompt: string,
   options: ClaudeServiceOptions,
@@ -60,8 +100,17 @@ export function invokeClaude(
       args.push("--model", options.model);
     }
 
+    if (options.extraArgs.trim()) {
+      args.push(...parseArgs(options.extraArgs));
+    }
+
+    const spawnEnv = options.envVars.trim()
+      ? { ...process.env, ...parseEnvVars(options.envVars) }
+      : undefined;
+
     proc = spawn(options.claudePath, args, {
       stdio: ["pipe", "pipe", "pipe"],
+      ...(spawnEnv && { env: spawnEnv }),
     });
 
     let stderrData = "";

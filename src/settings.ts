@@ -7,6 +7,8 @@ export interface AIAnnotateSettings {
   timeout: number;
   systemPrompt: string;
   model: string;
+  extraArgs: string;
+  envVars: string;
 }
 
 export const DEFAULT_SETTINGS: AIAnnotateSettings = {
@@ -14,6 +16,8 @@ export const DEFAULT_SETTINGS: AIAnnotateSettings = {
   timeout: 60,
   systemPrompt: `You are editing a markdown document. Return ONLY the replacement text for the section marked between <!-- TARGET START --> and <!-- TARGET END --> delimiters. Preserve the document's voice and markdown formatting. Do not include line numbers in your response. Do not include the TARGET delimiters in your response. Return only the replacement text, nothing else.`,
   model: "",
+  extraArgs: "",
+  envVars: "",
 };
 
 export class AIAnnotateSettingTab extends PluginSettingTab {
@@ -120,5 +124,38 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl).setName("Advanced").setHeading();
+
+    new Setting(containerEl)
+      .setName("Extra CLI arguments")
+      .setDesc(
+        'Additional arguments passed to the claude process (e.g., --max-turns 5 --allowedTools "Edit,Write").'
+      )
+      .addText((text) =>
+        text
+          .setPlaceholder("")
+          .setValue(this.plugin.settings.extraArgs)
+          .onChange(async (value) => {
+            this.plugin.settings.extraArgs = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Environment variables")
+      .setDesc(
+        "One KEY=VALUE per line. Merged into the CLI process environment."
+      )
+      .addTextArea((text) => {
+        text
+          .setPlaceholder("CLAUDE_CODE_MAX_MEMORY=1024")
+          .setValue(this.plugin.settings.envVars)
+          .onChange(async (value) => {
+            this.plugin.settings.envVars = value;
+            await this.plugin.saveSettings();
+          });
+        text.inputEl.rows = 4;
+      });
   }
 }
