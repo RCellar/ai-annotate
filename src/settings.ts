@@ -2,11 +2,14 @@ import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import { spawn } from "child_process";
 import type AIAnnotatePlugin from "./main";
 
+export type ContextStrategy = "full" | "section" | "neighbors";
+
 export interface AIAnnotateSettings {
   claudePath: string;
   timeout: number;
   systemPrompt: string;
   model: string;
+  contextStrategy: ContextStrategy;
   extraArgs: string;
   envVars: string;
 }
@@ -16,6 +19,7 @@ export const DEFAULT_SETTINGS: AIAnnotateSettings = {
   timeout: 60,
   systemPrompt: `You are editing a markdown document. Return ONLY the replacement text for the section marked between <!-- TARGET START --> and <!-- TARGET END --> delimiters. Preserve the document's voice and markdown formatting. Do not include line numbers in your response. Do not include the TARGET delimiters in your response. Return only the replacement text, nothing else.`,
   model: "",
+  contextStrategy: "neighbors",
   extraArgs: "",
   envVars: "",
 };
@@ -121,6 +125,23 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.model)
           .onChange(async (value) => {
             this.plugin.settings.model = value.trim();
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Context sent to Claude")
+      .setDesc(
+        "How much of the document to include in each prompt. Smaller context reduces token cost but limits Claude's awareness of the full document."
+      )
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption("neighbors", "Target section ± neighbors (default)")
+          .addOption("section", "Target section only")
+          .addOption("full", "Full document")
+          .setValue(this.plugin.settings.contextStrategy)
+          .onChange(async (value) => {
+            this.plugin.settings.contextStrategy = value as ContextStrategy;
             await this.plugin.saveSettings();
           })
       );

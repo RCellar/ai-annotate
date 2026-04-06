@@ -1,6 +1,6 @@
 import { Notice } from "obsidian";
 import type { Annotation } from "./types";
-import type { AIAnnotateSettings } from "./settings";
+import type { AIAnnotateSettings, ContextStrategy } from "./settings";
 import { invokeClaude } from "./claude-service";
 import { computeDiff } from "./diff-engine";
 
@@ -41,7 +41,11 @@ export class AnnotationManager {
     annotation.state = "pending";
     onStateChange(annotation);
 
-    const prompt = this.assemblePrompt(annotation, fullDocText);
+    const prompt = this.assemblePrompt(
+      annotation,
+      fullDocText,
+      settings.contextStrategy
+    );
 
     annotation.state = "processing";
     onStateChange(annotation);
@@ -154,28 +158,70 @@ export class AnnotationManager {
     );
   }
 
-  private assemblePrompt(annotation: Annotation, fullDocText: string): string {
+  private assemblePrompt(
+    annotation: Annotation,
+    fullDocText: string,
+    contextStrategy: ContextStrategy
+  ): string {
     const lines = fullDocText.split("\n");
-    const numberedLines: string[] = [];
 
+    // Find which line each character offset falls on
     let charCount = 0;
     let targetStartLine = -1;
     let targetEndLine = -1;
 
     for (let i = 0; i < lines.length; i++) {
       const lineEnd = charCount + lines[i]!.length;
-
       if (targetStartLine === -1 && lineEnd >= annotation.targetFrom) {
         targetStartLine = i;
       }
       if (targetEndLine === -1 && lineEnd >= annotation.targetTo) {
         targetEndLine = i;
       }
-
       charCount = lineEnd + 1;
     }
 
-    for (let i = 0; i < lines.length; i++) {
+    // Determine which lines to include based on context strategy
+    let fromLine = 0;
+    let toLine = lines.length - 1;
+
+    if (contextStrategy !== "full") {
+      // Find heading-based section boundaries
+      const headingLines = lines
+        .map((line, i) => ({ line: i, isHeading: /^#{1,6}\s+/.test(line) }))
+        .filter((h) => h.isHeading)
+        .map((h) => h.line);
+
+      // Find the section containing the target
+      let sectionStart = 0;
+      let sectionEnd = lines.length - 1;
+      for (let i = 0; i < headingLines.length; i++) {
+        if (headingLines[i]! <= targetStartLine) {
+          sectionStart = headingLines[i]!;
+          sectionEnd =
+            i + 1 < headingLines.length
+              ? headingLines[i + 1]! - 1
+              : lines.length - 1;
+        }
+      }
+
+      if (contextStrategy === "section") {
+        fromLine = sectionStart;
+        toLine = sectionEnd;
+      } else {
+        // "neighbors" — include previous and next sections
+        const sectionIdx = headingLines.indexOf(sectionStart);
+        fromLine =
+          sectionIdx > 0 ? headingLines[sectionIdx - 1]! : 0;
+        toLine =
+          sectionIdx + 2 < headingLines.length
+            ? headingLines[sectionIdx + 2]! - 1
+            : lines.length - 1;
+      }
+    }
+
+    const numberedLines: string[] = [];
+    for (let i = fromLine; i <= toLine; i++) {
       if (i === targetStartLine) {
         numberedLines.push("<!-- TARGET START -->");
       }
