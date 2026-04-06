@@ -179,6 +179,11 @@ function buildDecorations(
       continue;
     }
 
+    // Skip annotations whose range has collapsed (e.g., target deleted during review)
+    if (annotation.targetFrom >= annotation.targetTo) {
+      continue;
+    }
+
     // Review buttons widget (block, above target)
     ranges.push({
       from: annotation.targetFrom,
@@ -200,7 +205,7 @@ function buildDecorations(
     });
   }
 
-  ranges.sort((a, b) => a.from - b.from || a.to - b.to);
+  ranges.sort((a, b) => a.from - b.from || a.value.startSide - b.value.startSide || a.to - b.to);
   return Decoration.set(ranges.map((r) => r.value.range(r.from, r.to)));
 }
 

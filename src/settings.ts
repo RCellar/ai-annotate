@@ -50,7 +50,7 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
           .setPlaceholder("Claude")
           .setValue(this.plugin.settings.claudePath)
           .onChange(async (value) => {
-            this.plugin.settings.claudePath = value;
+            this.plugin.settings.claudePath = value.trim() || DEFAULT_SETTINGS.claudePath;
             await this.plugin.saveSettings();
           })
       );

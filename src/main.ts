@@ -221,6 +221,11 @@ export default class AIAnnotatePlugin extends Plugin {
     editor: Editor,
     view: MarkdownView
   ) {
+    if (!annotation.originalText) {
+      new Notice("AI annotate: no target text found for this annotation. Add content between the heading and the %%AI marker.");
+      return;
+    }
+
     const docText = editor.getValue();
     const cmView = this.getCmView(view);
     if (!cmView) return;
@@ -356,6 +361,11 @@ export default class AIAnnotatePlugin extends Plugin {
         pending.targetTo += totalDelta;
         if (pending.markerFrom !== undefined) pending.markerFrom += totalDelta;
         if (pending.markerTo !== undefined) pending.markerTo += totalDelta;
+        // Re-read originalText from the live document at adjusted offsets
+        pending.originalText = editor.getRange(
+          editor.offsetToPos(pending.targetFrom),
+          editor.offsetToPos(pending.targetTo)
+        );
       }
     }
   }
