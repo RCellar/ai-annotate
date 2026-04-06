@@ -1,4 +1,5 @@
 import {
+  EditorState,
   StateField,
   StateEffect,
   type Transaction,
@@ -276,4 +277,31 @@ export const diffStateField = StateField.define<DiffFieldState>({
   provide(field) {
     return EditorView.decorations.from(field, (state) => state.decorations);
   },
+});
+
+// --- Change Filter (blocks edits inside active review regions) ---
+
+export const reviewChangeFilter = EditorState.changeFilter.of((tr) => {
+  const state = tr.startState.field(diffStateField, false);
+  if (!state || state.annotations.size === 0) return true;
+
+  const protectedRanges: Array<{ from: number; to: number }> = [];
+  for (const ann of state.annotations.values()) {
+    if (ann.state === "review" && ann.targetFrom < ann.targetTo) {
+      protectedRanges.push({ from: ann.targetFrom, to: ann.targetTo });
+    }
+  }
+
+  if (protectedRanges.length === 0) return true;
+
+  let allowed = true;
+  tr.changes.iterChanges((fromA, toA) => {
+    for (const range of protectedRanges) {
+      if (fromA < range.to && toA > range.from) {
+        allowed = false;
+      }
+    }
+  });
+
+  return allowed;
 });

@@ -10,6 +10,7 @@ import { parseAnnotations, createSelectionAnnotation } from "./annotation-parser
 import { AnnotationManager } from "./annotation-manager";
 import {
   diffStateField,
+  reviewChangeFilter,
   addDiffEffect,
   removeDiffEffect,
   setReviewActionHandler,
@@ -29,7 +30,7 @@ export default class AIAnnotatePlugin extends Plugin {
     this.addSettingTab(new AIAnnotateSettingTab(this.app, this));
 
     // Register CM6 extensions
-    this.registerEditorExtension([diffStateField]);
+    this.registerEditorExtension([diffStateField, reviewChangeFilter]);
 
     // Set up review action handler
     setReviewActionHandler((action) => {
