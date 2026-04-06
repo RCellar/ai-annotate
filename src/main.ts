@@ -471,29 +471,32 @@ export default class AIAnnotatePlugin extends Plugin {
     const cmView = this.getCmView(view);
     if (!cmView) return;
 
-    // Remove diff decorations first
+    // Remove diff decorations (effect only, not a document change)
     cmView.dispatch({
       effects: removeDiffEffect.of({ annotationId }),
     });
 
-    // Replace the target text with the proposed text
-    const from = editor.offsetToPos(annotation.targetFrom);
-    const to = editor.offsetToPos(annotation.targetTo);
-    editor.replaceRange(annotation.proposedText, from, to);
+    // Build all document changes BEFORE any mutation, using original positions.
+    // CM6 applies multiple changes simultaneously against the original doc state.
+    const changes: Array<{ from: number; to: number; insert: string }> = [];
 
-    let totalDelta =
-      annotation.proposedText.length - annotation.originalText.length;
+    // 1. Replace the target text with the proposed text
+    changes.push({
+      from: annotation.targetFrom,
+      to: annotation.targetTo,
+      insert: annotation.proposedText,
+    });
 
-    // If inline marker, also remove the %%ai ... %% marker or line
+    // 2. If inline marker, also remove the %%ai ... %% marker or line
     if (
       annotation.source === "inline" &&
       annotation.markerFrom !== undefined &&
       annotation.markerTo !== undefined
     ) {
-      const adjustedMarkerFrom = annotation.markerFrom + totalDelta;
-      const adjustedMarkerTo = annotation.markerTo + totalDelta;
-
-      const markerFromPos = editor.offsetToPos(adjustedMarkerFrom);
+      // Read line info from the ORIGINAL document (before any mutation)
+      const markerFrom = annotation.markerFrom;
+      const markerTo = annotation.markerTo;
+      const markerFromPos = editor.offsetToPos(markerFrom);
       const lineNum = markerFromPos.line;
       const lineStart = editor.posToOffset({ line: lineNum, ch: 0 });
       const docLength = editor.getValue().length;
@@ -507,30 +510,27 @@ export default class AIAnnotatePlugin extends Plugin {
         editor.offsetToPos(nextLineStart)
       );
       const markerText = editor.getRange(
-        editor.offsetToPos(adjustedMarkerFrom),
-        editor.offsetToPos(adjustedMarkerTo)
+        editor.offsetToPos(markerFrom),
+        editor.offsetToPos(markerTo)
       );
       const markerOnly = lineText.trim() === markerText.trim();
 
       if (markerOnly) {
         // Marker is the only content on the line — delete the whole line
-        const markerLineLength = nextLineStart - lineStart;
-        editor.replaceRange(
-          "",
-          editor.offsetToPos(lineStart),
-          editor.offsetToPos(nextLineStart)
-        );
-        totalDelta -= markerLineLength;
+        changes.push({ from: lineStart, to: nextLineStart, insert: "" });
       } else {
         // Marker is inline with other text — delete only the marker
-        const markerLength = adjustedMarkerTo - adjustedMarkerFrom;
-        editor.replaceRange(
-          "",
-          editor.offsetToPos(adjustedMarkerFrom),
-          editor.offsetToPos(adjustedMarkerTo)
-        );
-        totalDelta -= markerLength;
+        changes.push({ from: markerFrom, to: markerTo, insert: "" });
       }
+    }
+
+    // 3. Dispatch all changes as a single atomic transaction (one undo step)
+    cmView.dispatch({ changes });
+
+    // Compute totalDelta by summing all changes
+    let totalDelta = 0;
+    for (const change of changes) {
+      totalDelta += change.insert.length - (change.to - change.from);
     }
 
     // Adjust remaining annotations' offsets — both in the manager's map
