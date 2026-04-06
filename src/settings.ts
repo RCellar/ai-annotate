@@ -37,18 +37,17 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("AI Annotate")
       .setHeading()
       .setDesc(
-        'Write %%ai your instruction %% in any note, then use the command palette to process. Select text and use "Annotate selection" for targeted edits.'
+        'Write %%AI your instruction %% in any note, then use the command palette to process. Select text and use "annotate selection" for targeted edits.'
       );
 
     new Setting(containerEl)
       .setName("Claude CLI path")
-      .setDesc("Path to the claude binary. Default assumes it is on your PATH.")
+      .setDesc("Path to the claude binary. Default assumes it is on your path.")
       .addText((text) =>
         text
-          .setPlaceholder("claude")
+          .setPlaceholder("Claude")
           .setValue(this.plugin.settings.claudePath)
           .onChange(async (value) => {
             this.plugin.settings.claudePath = value;
@@ -58,7 +57,7 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Test CLI connection")
-      .setDesc("Verify that the Claude CLI is reachable.")
+      .setDesc("Verify that the claude CLI is reachable.")
       .addButton((btn) =>
         btn.setButtonText("Test").onClick(() => {
           const proc = spawn(this.plugin.settings.claudePath, ["--version"], {
@@ -86,7 +85,7 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Timeout")
-      .setDesc("Maximum seconds to wait for a Claude response.")
+      .setDesc("Maximum seconds to wait for a claude response.")
       .addText((text) =>
         text
           .setPlaceholder("60")
@@ -105,7 +104,7 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
       .setDesc("The system prompt sent with every annotation request.")
       .addTextArea((text) => {
         text
-          .setPlaceholder("You are editing a markdown document...")
+          .setPlaceholder("You are editing a Markdown document...")
           .setValue(this.plugin.settings.systemPrompt)
           .onChange(async (value) => {
             this.plugin.settings.systemPrompt = value;
@@ -117,7 +116,7 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Model")
       .setDesc(
-        "Optional. Override the default Claude model (e.g., claude-sonnet-4-5-20250514). Leave empty to use CLI default."
+        "Optional. Override the default claude model (e.g., claude-sonnet-4-5-20250514). Leave empty to use CLI default."
       )
       .addText((text) =>
         text
@@ -130,9 +129,9 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Context sent to Claude")
+      .setName("Context sent to claude")
       .setDesc(
-        "How much of the document to include in each prompt. Smaller context reduces token cost but limits Claude's awareness of the full document."
+        "How much of the document to include in each prompt. Smaller context reduces token cost but limits claude's awareness of the full document."
       )
       .addDropdown((dropdown) =>
         dropdown
@@ -158,7 +157,7 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Extra CLI arguments")
       .setDesc(
-        'Additional arguments passed to the claude process (e.g., --max-turns 5 --allowedTools "Edit,Write").'
+        'Additional arguments passed to the claude process (e.g., --max-turns 5 --allowedTools "edit,write").'
       )
       .addText((text) =>
         text
@@ -173,10 +172,11 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Environment variables")
       .setDesc(
-        "One KEY=VALUE per line. Merged into the CLI process environment."
+        "One key=value per line. Merged into the CLI process environment."
       )
       .addTextArea((text) => {
         text
+          // eslint-disable-next-line obsidianmd/ui/sentence-case
           .setPlaceholder("CLAUDE_CODE_MAX_MEMORY=1024")
           .setValue(this.plugin.settings.envVars)
           .onChange(async (value) => {

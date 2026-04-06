@@ -55,7 +55,7 @@ export default class AIAnnotatePlugin extends Plugin {
       id: "process-all-annotations",
       name: "Process all annotations",
       editorCallback: (editor: Editor, view: MarkdownView) => {
-        this.processAllAnnotations(editor, view);
+        void this.processAllAnnotations(editor, view);
       },
     });
 
@@ -116,14 +116,14 @@ export default class AIAnnotatePlugin extends Plugin {
     });
     proc.on("error", () => {
       new Notice(
-        `AI Annotate: Claude CLI not found at "${this.settings.claudePath}". Check Settings > AI Annotate.`,
+        `AI annotate: claude CLI not found at "${this.settings.claudePath}". Check settings > AI annotate.`,
         8000
       );
     });
     proc.on("close", (code) => {
       if (code !== 0) {
         new Notice(
-          `AI Annotate: Claude CLI at "${this.settings.claudePath}" exited with an error. Run "claude login" in your terminal if not authenticated.`,
+          `AI annotate: claude CLI at "${this.settings.claudePath}" exited with an error. Run "claude login" in your terminal if not authenticated.`,
           8000
         );
       }
@@ -169,11 +169,11 @@ export default class AIAnnotatePlugin extends Plugin {
     }
 
     if (!annotation) {
-      new Notice("No annotation found near cursor. Place cursor on or near a %%ai marker.");
+      new Notice("No annotation found near cursor. Place cursor on or near a %%AI marker.");
       return;
     }
 
-    this.processAnnotation(annotation, editor, view);
+    void this.processAnnotation(annotation, editor, view);
   }
 
   private async processAllAnnotations(editor: Editor, view: MarkdownView) {
@@ -224,14 +224,14 @@ export default class AIAnnotatePlugin extends Plugin {
     const from = editor.posToOffset(editor.getCursor("from"));
     const to = editor.posToOffset(editor.getCursor("to"));
 
-    const modal = new InstructionModal(this.app, async (instruction) => {
+    const modal = new InstructionModal(this.app, (instruction) => {
       const annotation = createSelectionAnnotation(
         instruction,
         selection,
         from,
         to
       );
-      await this.processAnnotation(annotation, editor, view);
+      void this.processAnnotation(annotation, editor, view);
     });
     modal.open();
   }
@@ -345,7 +345,7 @@ export default class AIAnnotatePlugin extends Plugin {
 
   private getCmView(view: MarkdownView): EditorView | null {
     // @ts-expect-error -- internal Obsidian API
-    return view.editor?.cm as EditorView | null;
+    return view.editor?.cm ?? null;
   }
 
   async loadSettings() {
@@ -373,23 +373,23 @@ class InstructionModal extends Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.createEl("h3", {
-      text: "What should Claude do with this text?",
+      text: "What should claude do with this text?",
     });
 
     const input = contentEl.createEl("textarea", {
       cls: "ai-annotate-instruction-input",
       attr: {
         placeholder:
-          "e.g., Make this more concise, Add citations, Rewrite for clarity...",
+          "E.g., make this more concise, add citations, rewrite for clarity...",
         rows: "3",
-        "aria-label": "Instruction for Claude",
+        "aria-label": "Instruction for claude",
       },
     });
     const submitBtn = contentEl.createEl("button", {
       cls: "mod-cta",
       text: "Process",
       attr: {
-        "aria-label": "Submit instruction to Claude",
+        "aria-label": "Submit instruction to claude",
       },
     });
 

@@ -51,10 +51,9 @@ class ReviewButtonsWidget extends WidgetType {
     container.className = "ai-annotate-review-bar";
 
     const label = container.createSpan({ cls: "ai-annotate-review-label" });
-    label.textContent = "AI Annotate \u2014 Review changes";
+    label.textContent = "Review changes";
 
-    const spacer = container.createSpan({ cls: "ai-annotate-review-spacer" });
-    spacer.style.flex = "1";
+    container.createSpan({ cls: "ai-annotate-review-spacer" });
 
     const acceptBtn = container.createEl("button", {
       cls: "ai-annotate-accept-btn",
@@ -63,7 +62,7 @@ class ReviewButtonsWidget extends WidgetType {
         "data-tooltip-position": "top",
       },
     });
-    acceptBtn.textContent = "\u2713 Accept";
+    acceptBtn.textContent = "\u2713 accept";
     acceptBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       reviewActionHandler?.({ type: "accept", annotationId: this.annotationId });
@@ -85,7 +84,7 @@ class ReviewButtonsWidget extends WidgetType {
         "data-tooltip-position": "top",
       },
     });
-    rejectBtn.textContent = "\u2717 Reject";
+    rejectBtn.textContent = "\u2717 reject";
     rejectBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       reviewActionHandler?.({ type: "reject", annotationId: this.annotationId });

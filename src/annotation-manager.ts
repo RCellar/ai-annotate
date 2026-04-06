@@ -8,16 +8,16 @@ function friendlyError(raw: string, claudePath: string, timeout: number): string
   const lower = raw.toLowerCase();
 
   if (lower.includes("enoent") || lower.includes("not found") || lower.includes("no such file")) {
-    return `Claude CLI not found at "${claudePath}". Check Settings > AI Annotate.`;
+    return `claude CLI not found at "${claudePath}". Check settings > AI annotate.`;
   }
   if (lower.includes("auth") || lower.includes("401") || lower.includes("unauthorized") || lower.includes("not logged in")) {
-    return 'Claude CLI not authenticated. Run "claude login" in your terminal.';
+    return 'claude CLI not authenticated. Run "claude login" in your terminal.';
   }
   if (lower.includes("rate") || lower.includes("429") || lower.includes("too many")) {
-    return "Rate limited by Claude. Try again in a moment.";
+    return "Rate limited by claude. Try again in a moment.";
   }
   if (lower.includes("timed out") || lower.includes("timeout")) {
-    return `Claude CLI timed out after ${timeout}s. Increase timeout in Settings > AI Annotate.`;
+    return `claude CLI timed out after ${timeout}s. Increase timeout in settings > AI annotate.`;
   }
 
   // Default: show first line of raw error, truncated
@@ -83,7 +83,7 @@ export class AnnotationManager {
     if (!result.text) {
       annotation.state = "created";
       onStateChange(annotation);
-      new Notice("AI Annotate: Claude returned an empty response.");
+      new Notice("AI annotate: claude returned an empty response.", 5000);
       return annotation;
     }
 

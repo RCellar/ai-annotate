@@ -22,7 +22,7 @@ export class AnnotationMarkerWidget extends WidgetType {
     container.className = "ai-annotate-marker";
 
     const label = container.createSpan({ cls: "ai-annotate-marker-label" });
-    label.textContent = "%%ai";
+    label.textContent = "%%AI";
 
     const instructionEl = container.createSpan({
       cls: "ai-annotate-marker-instruction",
@@ -42,7 +42,7 @@ export class AnnotationMarkerWidget extends WidgetType {
           "data-tooltip-position": "top",
         },
       });
-      cancelBtn.textContent = "\u25A0 Cancel";
+      cancelBtn.textContent = "\u25A0 cancel";
       cancelBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         if (this.annotationId) {
@@ -65,7 +65,7 @@ export class AnnotationMarkerWidget extends WidgetType {
           "data-tooltip-position": "top",
         },
       });
-      processBtn.textContent = "\u25B6 Process";
+      processBtn.textContent = "\u25B6 process";
       processBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         this.onAction({
