@@ -240,6 +240,11 @@ export default class AIAnnotatePlugin extends Plugin {
   }
 
   private annotateSelection(editor: Editor, view: MarkdownView) {
+    if (this.processing) {
+      new Notice("AI annotate: already processing. Wait for the current annotation to finish.");
+      return;
+    }
+
     const selection = editor.getSelection();
     if (!selection) return;
 
@@ -247,13 +252,20 @@ export default class AIAnnotatePlugin extends Plugin {
     const to = editor.posToOffset(editor.getCursor("to"));
 
     const modal = new InstructionModal(this.app, (instruction) => {
+      if (this.processing) {
+        new Notice("AI annotate: already processing. Wait for the current annotation to finish.");
+        return;
+      }
       const annotation = createSelectionAnnotation(
         instruction,
         selection,
         from,
         to
       );
-      void this.processAnnotation(annotation, editor, view);
+      this.processing = true;
+      void this.processAnnotation(annotation, editor, view).finally(() => {
+        this.processing = false;
+      });
     });
     modal.open();
   }
@@ -345,14 +357,6 @@ export default class AIAnnotatePlugin extends Plugin {
         if (pending.markerFrom !== undefined) pending.markerFrom += totalDelta;
         if (pending.markerTo !== undefined) pending.markerTo += totalDelta;
       }
-    }
-    const remaining = this.manager.getReviewAnnotations();
-    if (remaining.length > 0) {
-      const effects = remaining.flatMap((a) => [
-        removeDiffEffect.of({ annotationId: a.id }),
-        addDiffEffect.of({ annotation: a }),
-      ]);
-      cmView.dispatch({ effects });
     }
   }
 

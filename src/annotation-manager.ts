@@ -190,6 +190,10 @@ export class AnnotationManager {
       charCount = lineEnd + 1;
     }
 
+    // Clamp to valid line indices when target reaches document boundaries
+    if (targetStartLine === -1) targetStartLine = lines.length - 1;
+    if (targetEndLine === -1) targetEndLine = lines.length - 1;
+
     // Determine which lines to include based on context strategy
     let fromLine = 0;
     let toLine = lines.length - 1;

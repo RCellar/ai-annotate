@@ -5,9 +5,19 @@ interface LCSPair {
   pi: number;
 }
 
+const LCS_MAX_CELLS = 250_000;
+
 export function computeDiff(original: string, proposed: string): DiffChunk[] {
   const origWords = tokenize(original);
   const propWords = tokenize(proposed);
+
+  // For very large inputs, skip word-level LCS and show a full replacement
+  if (origWords.length * propWords.length > LCS_MAX_CELLS) {
+    return [
+      { type: "remove", text: original },
+      { type: "add", text: proposed },
+    ];
+  }
 
   const lcs = lcsDP(origWords, propWords);
 

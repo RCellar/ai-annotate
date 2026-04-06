@@ -1,7 +1,5 @@
 import type { Annotation } from "./types";
 
-const MARKER_REGEX = /%%ai\s+([\s\S]*?)%%/g;
-
 interface CodeRange {
   from: number;
   to: number;
@@ -57,10 +55,10 @@ function isInsideCode(offset: number, codeRanges: CodeRange[]): boolean {
 export function parseAnnotations(docText: string): Annotation[] {
   const annotations: Annotation[] = [];
   const codeRanges = findCodeRanges(docText);
+  const markerRegex = /%%ai\s+([\s\S]*?)%%/g;
   let match: RegExpExecArray | null;
 
-  MARKER_REGEX.lastIndex = 0;
-  while ((match = MARKER_REGEX.exec(docText)) !== null) {
+  while ((match = markerRegex.exec(docText)) !== null) {
     const markerFrom = match.index;
     if (isInsideCode(markerFrom, codeRanges)) continue;
 

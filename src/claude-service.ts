@@ -20,7 +20,7 @@ export function sanitizeResponse(text: string): string {
 
   // Strip wrapping markdown fences (```markdown ... ``` or ``` ... ```)
   const fenceMatch = result.match(
-    /^```(?:\w*)\s*\n([\s\S]*?)\n\s*```\s*$/
+    /^```(?:\w*)\s*\n([\s\S]*?)\n?\s*```\s*$/
   );
   if (fenceMatch) {
     result = fenceMatch[1]!.trim();

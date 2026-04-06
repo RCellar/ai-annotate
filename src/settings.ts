@@ -64,16 +64,19 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
             stdio: ["ignore", "pipe", "pipe"],
           });
           let stdout = "";
+          let errored = false;
           proc.stdout?.on("data", (d: Buffer) => {
             stdout += d.toString();
           });
           proc.on("error", () => {
+            errored = true;
             new Notice(
               `CLI not found at "${this.plugin.settings.claudePath}".`,
               5000
             );
           });
           proc.on("close", (code) => {
+            if (errored) return;
             if (code === 0) {
               new Notice(`Claude CLI OK: ${stdout.trim().split("\n")[0]}`, 5000);
             } else {
