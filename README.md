@@ -66,17 +66,19 @@ being more concise and direct in its language.
 %%ai Make this more concise %%
 ```
 
-**To process:** Place your cursor on or near the `%%ai` line (within 3 lines, or anywhere in the target section) and run **"Process annotation at cursor"** from the command palette (`Ctrl+P` / `Cmd+P`).
+**To process:** Place your cursor on or near the `%%ai` line (within 3 lines, or anywhere in the target section) and run **"Process annotation at cursor"** from the command palette (`Ctrl+P` / `Cmd+P`). You can also right-click and select **"Process this annotation"** from the context menu.
 
-Claude's proposed changes appear as an interleaved inline diff — deletions in red with strikethrough (prefixed `−`), additions in green (prefixed `+`), shown adjacent at each change point. Click **Accept** to apply the changes (the `%%ai` marker is also removed) or **Reject** to keep the original text.
+The status bar shows progress as Claude processes your request. Claude's proposed changes appear as an interleaved inline diff — deletions in red with strikethrough (prefixed `−`), additions in green (prefixed `+`), shown adjacent at each change point. A notification appears and the editor scrolls to the diff when it's ready.
+
+Click **Accept** to apply the changes (the `%%ai` marker is also removed) or **Reject** to keep the original text. You can also use the keyboard commands **"Accept change at cursor"** / **"Reject change at cursor"**, or right-click for context menu options. Accepting a change is a single undo step — press `Ctrl+Z` / `Cmd+Z` to revert it.
 
 ![Demo: processing all %%ai markers in a document](assets/AnnotateAll.gif)
 
 ### Selection-based annotations
 
 1. Highlight any text in your note
-2. Open the command palette and run **"Annotate selection"**
-3. Type your instruction in the modal (e.g., "Add more detail", "Rewrite for clarity")
+2. Run **"Annotate selection"** from the command palette or right-click and select it from the context menu
+3. Type your instruction in the modal — recent instructions appear as clickable suggestions
 4. Press the **Process** button or `Ctrl+Enter` / `Cmd+Enter`
 
 The diff appears inline over the selected text with the same accept/reject controls.
@@ -96,6 +98,12 @@ Override the Claude model for a single annotation by adding a `model:` prefix:
 ```
 
 The model name must match a valid Claude model ID. If omitted, the global model setting is used.
+
+### Reviewing changes
+
+Use **"Go to next change"** and **"Go to previous change"** to navigate between pending diffs. Accept or reject each with the keyboard commands, context menu, or the inline buttons. The status bar shows how many changes are pending review.
+
+While a diff is in review, the target region is protected from edits to prevent position corruption. Accept or reject the change first.
 
 ### Accept all / Reject all
 
