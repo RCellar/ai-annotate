@@ -162,7 +162,7 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Extra CLI arguments")
       .setDesc(
-        'Additional arguments passed to the claude process (e.g., --max-turns 5 --allowedTools "edit,write").'
+        "Additional arguments passed to the claude process (e.g., --max-turns 5)."
       )
       .addText((text) =>
         text
@@ -181,8 +181,7 @@ export class AIAnnotateSettingTab extends PluginSettingTab {
       )
       .addTextArea((text) => {
         text
-          // eslint-disable-next-line obsidianmd/ui/sentence-case
-          .setPlaceholder("CLAUDE_CODE_MAX_MEMORY=1024")
+          .setPlaceholder("")
           .setValue(this.plugin.settings.envVars)
           .onChange(async (value) => {
             this.plugin.settings.envVars = value;
